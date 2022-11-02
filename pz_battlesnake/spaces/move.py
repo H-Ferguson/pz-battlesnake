@@ -14,7 +14,7 @@ class Move(Space[str]):
         - "right"
     """
 
-    possible_moves: List[str] = ["up", "down", "left", "right", "None"]
+    possible_moves: List[str] = ["up", "down", "left", "right"]
 
     def __init__(self):
         self.moves: List[str] = self.possible_moves
@@ -48,6 +48,9 @@ class Move(Space[str]):
         for agent in agents:
             move = agents[agent]
             agents[agent] = Move.possible_moves[move]
+
+    def n(self) -> int:
+        return len(self.possible_moves)
 
     def __repr__(self) -> str:
         """Gives a string representation of this space."""
