@@ -49,7 +49,7 @@ class Move(Space[str]):
             move = agents[agent]
             agents[agent] = Move.possible_moves[move]
 
-    def nun_actions(self) -> int:
+    def num_actions(self) -> int:
         return len(self.possible_moves)
 
     def __repr__(self) -> str:
