@@ -14,13 +14,13 @@ class Move(Space[str]):
         - "right"
     """
 
-    possible_moves: List[str] = ["up", "down", "left", "right"]
+    possible_moves: List[str] = ["up", "down", "left", "right", "None"]
 
     def __init__(self):
         self.moves: List[str] = self.possible_moves
         super().__init__()
 
-    def sample(self) -> str:
+    def sample(self) -> int:
         """
         Returns a random move from the list of possible moves.
 
@@ -32,7 +32,7 @@ class Move(Space[str]):
             >>> move.sample()
             "up"
         """
-        return random.choice(self.moves)
+        return self.possible_moves.index(random.choice(self.moves))
 
     def contains(self, x) -> bool:
         """
@@ -43,6 +43,11 @@ class Move(Space[str]):
             bool: True if the input is one of the 4 possible moves, otherwise False.
         """
         return x in self.moves
+
+    def moves_index_to_strings(agents):
+        for agent in agents:
+            move = agents[agent]
+            agents[agent] = Move.possible_moves[move]
 
     def __repr__(self) -> str:
         """Gives a string representation of this space."""

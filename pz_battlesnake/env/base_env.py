@@ -141,7 +141,8 @@ class BaseEnv(ParallelEnv):
         step(action) takes in an action for each agent and should return the
             - observations
             - rewards
-            - dones
+            - terminations
+            - truncations
             - infos
         dicts where each dict looks like {agent_0: item_1, agent_1: item_2}
 
@@ -150,22 +151,24 @@ class BaseEnv(ParallelEnv):
         """
         if not action:
             self.agents = []
-            return {}, {}, {}, {}
+            return {}, {}, {}, {}, {}
 
-        agents = env_step(action)
+        agents = env_step(Move.moves_index_to_strings(action))
 
         observations = {}
         rewards = {}
-        dones = {}
+        terminations = {}
+        truncations = {}
         infos = {}
 
         for agent in agents:
             observations[agent] = agents[agent]["observation"]
             rewards[agent] = agents[agent]["reward"]
-            dones[agent] = agents[agent]["done"]
+            terminations[agent] = agents[agent]["done"]
+            truncations[agent] = False # cannot find any documentation for this field lol
             infos[agent] = agents[agent]["info"]
 
         if env_done():
             self.agents = []
 
-        return observations, rewards, dones, infos
+        return observations, rewards, terminations, truncations, infos

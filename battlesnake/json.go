@@ -30,7 +30,7 @@ func getKeys(jsonDocument map[string]interface{}) []string {
 	return keys
 }
 
-// This convers json to a map of SnakeMoves
+// This converts json to a map of SnakeMoves
 func parseSnakeMoves(jsonDocument map[string]interface{}) []rules.SnakeMove {
 	var snakeMoves []rules.SnakeMove
 
