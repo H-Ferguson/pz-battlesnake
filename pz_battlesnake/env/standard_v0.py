@@ -23,7 +23,4 @@ def env(
     # Set the metadata enviorment name
     env.metadata["name"] = "battlesnake-standard_v0"
 
-    # Convert from MARL to AEC API
-    env = parallel_to_aec(env)
-
     return env

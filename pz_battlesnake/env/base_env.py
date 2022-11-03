@@ -2,13 +2,15 @@ import functools
 from typing import List
 from pettingzoo import ParallelEnv
 from pettingzoo.utils import parallel_to_aec, OrderEnforcingWrapper
-from gym import spaces
+from gym.spaces import Dict
+from gymnasium.spaces import Text, Discrete, Box
+import string
 
 # Local Imports
 from pz_battlesnake.constants import DEFAULT_COLORS
-from pz_battlesnake.spaces.move import Move
 from pz_battlesnake.types.battlesnake_options import BattlesnakeOptions
 from pz_battlesnake.wrapper import env_done, env_render, env_reset, env_setup, env_step
+from pz_battlesnake.env.game import Game
 
 
 def make_env(**kwargs):
@@ -60,6 +62,10 @@ class BaseEnv(ParallelEnv):
         )
 
         self.agent_selection = self.possible_agents[0]
+        self.game = Game(
+            width, 
+            height
+        )
 
         self._options = BattlesnakeOptions(
             width=width,
@@ -70,21 +76,17 @@ class BaseEnv(ParallelEnv):
             names=self.possible_agents,
         )
 
+        self.observation_spaces: Dict = dict(zip(self.possible_agents, [Box(low = 0, high = 5, shape=(width, height)) for _ in self.possible_agents]))
+        self.action_spaces: Dict = dict(zip(self.possible_agents, [Discrete(4) for _ in self.possible_agents]))
+
+
     @functools.lru_cache(maxsize=0)
-    def observation_space(self, agent=None):
+    def observation_space(self, agent=None) -> Box:
         """
         Todo:
             * Add Documentation for observation_space
         """
-        # Check if agent is provided
-        assert agent, "Agent must be provided"
-
-        # Check if agent is valid
-        assert agent in self.possible_agents, "agent must be one of {}".format(
-            self.possible_agents
-        )
-
-        return spaces.Dict()
+        return self.observation_spaces[agent]
 
     @functools.lru_cache(maxsize=0)
     def action_space(self, agent=None):
@@ -93,16 +95,7 @@ class BaseEnv(ParallelEnv):
         Todo:
             * Add Documentation for action_space
         """
-        # Check if agent is provided
-        assert agent, "Agent must be provided"
-
-        # Check if agent is valid
-        assert agent in self.possible_agents, "agent must be one of {}".format(
-            self.possible_agents
-        )
-
-        # assert False, "observation_space() is not implemented yet"
-        return Move()
+        return self.action_spaces[agent]
 
     def render(self, mode="ascii"):
         """
@@ -116,6 +109,7 @@ class BaseEnv(ParallelEnv):
             env_render(True if mode == "color" else False)
         else:
             assert False, "Valid render modes are 'ascii' and 'color'"
+
 
     def reset(self, seed=None, options=None):
         """
@@ -133,8 +127,12 @@ class BaseEnv(ParallelEnv):
             self._options.seed = seed
         else:
             self._options.seed = None
-
-        return env_reset(self._options.options)
+        observations = env_reset(self._options.options)
+        self.game.load_from_dict(observations[self.possible_agents[0]]["observation"]["board"])
+        observations = {}
+        for agent in self.possible_agents:
+            observations[agent] = self.game.board
+        return observations
 
     def step(self, action):
         """
@@ -162,7 +160,8 @@ class BaseEnv(ParallelEnv):
         infos = {}
 
         for agent in agents:
-            observations[agent] = agents[agent]["observation"]
+            self.game.load_from_dict(agents[agent]["observation"]["board"])
+            observations[agent] = self.game.board
             rewards[agent] = agents[agent]["reward"]
             terminations[agent] = agents[agent]["done"]
             truncations[agent] = False # cannot find any documentation for this field lol
@@ -172,3 +171,4 @@ class BaseEnv(ParallelEnv):
             self.agents = []
 
         return observations, rewards, terminations, truncations, infos
+
