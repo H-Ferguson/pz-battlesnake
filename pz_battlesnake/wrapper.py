@@ -72,5 +72,4 @@ def env_step(actions: dict):
     # convert result to python object
     res = json.loads(res.decode("utf-8"))
 
-    # return result
     return res

@@ -1,5 +1,10 @@
 
 
+class Snake():
+  def __init__(self):
+    self.id
+    self.health
+
 class Game():
   """
   A class for representing a battlesnake game
@@ -19,6 +24,7 @@ class Game():
     height: int = 11
   ):
     self.board = [[0 for x in range(width)] for y in range(height)] 
+    self.snakes = {}
   
   def load_from_dict(self, game):
     food = game["food"]
@@ -27,6 +33,7 @@ class Game():
     self.populate_food(food)
     self.populate_hazards(hazards)
     self.populate_snakes(snakes)
+    self.set_snakes(snakes)
   
   def populate_food(self, food):
     for piece in food:
@@ -37,7 +44,7 @@ class Game():
   def populate_hazards(self, hazards):
     for hazard in hazards:
       x = hazard["x"]
-      y = hazard["y"]
+      y = hazard["y"] 
       self.place_item(x, y, self.HAZARD)
 
   def populate_snakes(self, snakes):
@@ -55,5 +62,10 @@ class Game():
 
   def place_item(self, x, y, what):
     self.board[x][y] = what
+
+  def set_snakes(self, snakes):
+    for snake in snakes:
+      snake_id = snake["id"]
+      snake_health = snake["health"]
     
       

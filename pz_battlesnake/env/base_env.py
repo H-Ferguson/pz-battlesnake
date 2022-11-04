@@ -13,7 +13,7 @@ from pz_battlesnake.wrapper import env_done, env_render, env_reset, env_setup, e
 from pz_battlesnake.env.game import Game
 
 
-def make_env(**kwargs):
+def make_env(**kwargs):    
     """ """
     env = BaseEnv(**kwargs)
 
@@ -46,6 +46,8 @@ class BaseEnv(ParallelEnv):
     metadata = {
         "render_modes": ["human", "ascii", "color"],
     }
+
+    possible_moves: List[str] = ["up", "down", "left", "right"]
 
     def __init__(
         self,
@@ -151,7 +153,7 @@ class BaseEnv(ParallelEnv):
             self.agents = []
             return {}, {}, {}, {}, {}
 
-        agents = env_step(Move.moves_index_to_strings(action))
+        agents = env_step(self.moves_index_to_strings(action))
 
         observations = {}
         rewards = {}
@@ -171,4 +173,14 @@ class BaseEnv(ParallelEnv):
             self.agents = []
 
         return observations, rewards, terminations, truncations, infos
+
+    def moves_index_to_strings(self, agents):
+        actions = {}
+        for agent in agents:
+            move = agents[agent]
+            actions[agent] = self.possible_moves[move]
+        return actions
+
+    def get_board(self):
+        return self.game.board
 
