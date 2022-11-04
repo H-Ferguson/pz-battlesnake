@@ -24,7 +24,6 @@ class Game():
     height: int = 11
   ):
     self.board = [[0 for x in range(width)] for y in range(height)] 
-    self.snakes = {}
   
   def load_from_dict(self, game):
     food = game["food"]
@@ -33,7 +32,6 @@ class Game():
     self.populate_food(food)
     self.populate_hazards(hazards)
     self.populate_snakes(snakes)
-    self.set_snakes(snakes)
   
   def populate_food(self, food):
     for piece in food:
@@ -63,9 +61,4 @@ class Game():
   def place_item(self, x, y, what):
     self.board[x][y] = what
 
-  def set_snakes(self, snakes):
-    for snake in snakes:
-      snake_id = snake["id"]
-      snake_health = snake["health"]
-    
       
